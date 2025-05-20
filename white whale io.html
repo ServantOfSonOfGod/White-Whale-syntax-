@@ -1,0 +1,430 @@
+ 
+ <html lang="en"><head></head><body>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>White Whale - Code Loader</title>
+<!-- Prism.js CSS for syntax highlighting -->
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+  /* Reset and base styles */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0e3c52, #1a4c6c, #3a758c);
+    color: #f0f6f9;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Header with improved 3D styled whale logo */
+  header {
+    background: linear-gradient(90deg, #a9d6e5, #ffffff);
+    padding: 1.8rem 1rem;
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a4c6c;
+    letter-spacing: 0.12em;
+    box-shadow: 0 4px 16px rgba(169, 214, 229, 0.7);
+    user-select: none;
+    text-transform: uppercase;
+    border-radius: 0 0 15px 15px;
+    font-family: 'Poppins', sans-serif;
+    text-shadow:
+      0 0 8px #8ecae6,
+      0 0 20px #219ebc;
+    animation: glow 3s ease-in-out infinite alternate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+  @keyframes glow {
+    from {
+      text-shadow:
+        0 0 8px #8ecae6,
+        0 0 20px #219ebc;
+    }
+    to {
+      text-shadow:
+        0 0 14px #56cfe1,
+        0 0 28px #48cae4;
+    }
+  }
+  /* Enhanced 3D style whale SVG container */
+  #logo-container {
+    width: 50px;
+    height: 50px;
+    perspective: 120px;
+  }
+  #logo-container svg {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    filter:
+      drop-shadow(0 0 7px #48cae4)
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    animation: rotate3D 6s linear infinite;
+  }
+  @keyframes rotate3D {
+    0% {
+      transform: rotateY(0deg) rotateX(0deg);
+      filter: drop-shadow(0 0 5px #48cae4);
+    }
+    50% {
+      transform: rotateY(180deg) rotateX(15deg);
+      filter: drop-shadow(0 0 15px #56cfe1);
+    }
+    100% {
+      transform: rotateY(360deg) rotateX(0deg);
+      filter: drop-shadow(0 0 5px #48cae4);
+    }
+  }
+
+  main {
+    flex: 1;
+    display: none; /* hidden initially */
+    flex-direction: column;
+    padding: 1rem 1.25rem 2rem;
+    gap: 1.5rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+  }
+  main.active {
+    display: flex;
+  }
+  label {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: inline-block;
+    color: #dbe9f4;
+    text-shadow: 0 0 4px #1a4c6c;
+  }
+  select, textarea, button {
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    font-family: monospace, monospace;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  select {
+    padding: 0.55rem 0.85rem;
+    width: 100%;
+    max-width: 250px;
+    background-color: #15607a;
+    color: #e0f2f1;
+    box-shadow:
+      inset 3px 3px 8px #0c3a50,
+      inset -3px -3px 8px #1893c3;
+  }
+  select:hover, select:focus {
+    background-color: #1893c3;
+    outline: none;
+  }
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 1.15rem;
+    resize: vertical;
+    background-color: #164e63;
+    color: #d4f1f4;
+    box-shadow:
+      inset 5px 5px 12px #113a4b,
+      inset -5px -5px 12px #1e749a;
+    outline: none;
+  }
+  textarea::placeholder {
+    color: #a0c8d8;
+  }
+  textarea:focus {
+    background-color: #1e749a;
+  }
+  button {
+    background: linear-gradient(90deg, #ffffff, #a9d6e5);
+    color: #02475e;
+    padding: 0.9rem 1.7rem;
+    max-width: 160px;
+    cursor: pointer;
+    font-weight: 700;
+    border-radius: 10px;
+    box-shadow:
+      0 0 14px #a9d6e5,
+      0 0 26px #219ebc;
+    user-select: none;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+  button:hover, button:focus {
+    background: linear-gradient(90deg, #a9d6e5, #ffffff);
+    box-shadow:
+      0 0 28px #53c1e4,
+      0 0 48px #48cae4;
+    outline: none;
+  }
+  section.output {
+    flex: 1;
+    overflow: auto;
+    background-color: #164e63;
+    border-radius: 15px;
+    padding: 1.3rem;
+    box-shadow:
+      inset 0 0 24px #1f91bb;
+  }
+  pre {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    font-family: 'Source Code Pro', monospace;
+    color: #d4f1f4;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Loader page styles */
+  #loader-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    color: #dbe9f4;
+    text-align: center;
+  }
+  #loader-logo {
+    width: 120px;
+    height: 120px;
+    filter: drop-shadow(0 0 5px #48cae4);
+    animation: logoRotate3D 6s linear infinite;
+  }
+  /* Replace logo with improved 3D styled whale */
+  #loader-logo path {
+    fill: #1a4c6c;
+    filter:
+      drop-shadow(0 0 5px #48cae4)
+      drop-shadow(0 5px 8px rgba(0, 0, 0, 0.3));
+  }
+  @keyframes logoRotate3D {
+    0% {
+      transform: rotateY(0deg) rotateX(0deg);
+    }
+    50% {
+      transform: rotateY(180deg) rotateX(20deg);
+    }
+    100% {
+      transform: rotateY(360deg) rotateX(0deg);
+    }
+  }
+  #loading-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-shadow:
+      0 0 10px #8ecae6,
+      0 0 25px #219ebc;
+  }
+  /* 3D loading animation dots */
+  .loading-dots {
+    display: flex;
+    gap: 0.35em;
+    perspective: 600px;
+    user-select: none;
+  }
+  .loading-dots span {
+    width: 18px;
+    height: 18px;
+    background-color: #a9d6e5;
+    border-radius: 50%;
+    transform-style: preserve-3d;
+    animation-name: dotBounce3D;
+    animation-duration: 1.2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+  }
+  .loading-dots span:nth-child(1) {
+    animation-delay: 0s;
+  }
+  .loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  .loading-dots span:nth-child(4) {
+    animation-delay: 0.6s;
+  }
+  .loading-dots span:nth-child(5) {
+    animation-delay: 0.8s;
+  }
+  @keyframes dotBounce3D {
+    0%, 100% {
+      transform: translateZ(0) translateY(0) scale(1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      background-color: #a9d6e5;
+    }
+    50% {
+      transform: translateZ(40px) translateY(-18px) scale(1.3);
+      box-shadow: 0 8px 14px rgba(0,0,0,0.3);
+      background-color: #48cae4;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    button, select {
+      max-width: 100%;
+    }
+    main, #loader-page {
+      max-width: 100%;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+</style>
+
+
+<header>
+  <div id="logo-container" aria-label="White Whale Logo" role="img" aria-hidden="true">
+    <!-- Improved 3D styled White Whale SVG -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 64 64">
+      <defs>
+        <lineargradient id="whaleGradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0a4176" />
+          <stop offset="100%" stop-color="#4db6e7" />
+        </lineargradient>
+      </defs>
+      <path fill="url(#whaleGradient)" stroke="#06345c" stroke-width="1.5" d="M12 38c3-10 20-17 32-10 0 0-8-1-12 6l-13-2c-4 3-4 8-7 8z" />
+      <ellipse cx="42" cy="40" rx="7" ry="6" fill="url(#whaleGradient)" />
+      <circle cx="47" cy="38" r="1.7" fill="#051d30" />
+      <path fill="none" stroke="#06345c" stroke-width="1.5" d="M44 45c0 0 3 3 7 2" />
+      <path fill="none" stroke="#06345c" stroke-width="1.5" d="M29 38c0 3-1 6 5 6" />
+    </svg>
+  </div>
+  WHITE WHALE
+</header>
+
+<div id="loader-page" role="alert" aria-live="assertive">
+  <svg id="loader-logo" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 64 64" aria-hidden="true" focusable="false">
+    <defs>
+      <lineargradient id="loaderGradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#0a4176" />
+        <stop offset="100%" stop-color="#4db6e7" />
+      </lineargradient>
+    </defs>
+    <path fill="url(#loaderGradient)" stroke="#06345c" stroke-width="1.5" d="M12 38c3-10 20-17 32-10 0 0-8-1-12 6l-13-2c-4 3-4 8-7 8z" />
+    <ellipse cx="42" cy="40" rx="7" ry="6" fill="url(#loaderGradient)" />
+    <circle cx="47" cy="38" r="1.7" fill="#051d30" />
+    <path fill="none" stroke="#06345c" stroke-width="1.5" d="M44 45c0 0 3 3 7 2" />
+    <path fill="none" stroke="#06345c" stroke-width="1.5" d="M29 38c0 3-1 6 5 6" />
+  </svg>
+  <div id="loading-text">LOADING</div>
+  <div class="loading-dots" aria-label="Loading animation" role="img" aria-live="polite">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+</div>
+
+<main id="app-main" role="main" tabindex="-1" aria-label="Code Loader Application">
+  <div>
+    <label for="languageSelect">Select Language</label>
+    <select id="languageSelect" aria-label="Select programming language">
+      <option value="markup">HTML</option>
+      <option value="css">CSS</option>
+      <option value="javascript" selected>JavaScript</option>
+      <option value="python">Python</option>
+      <option value="java">Java</option>
+      <option value="c">C</option>
+      <option value="cpp">C++</option>
+      <option value="bash">Bash</option>
+      <option value="json">JSON</option>
+      <option value="php">PHP</option>
+      <option value="ruby">Ruby</option>
+      <option value="typescript">TypeScript</option>
+      <option value="go">Go</option>
+      <option value="swift">Swift</option>
+      <option value="kotlin">Kotlin</option>
+      <option value="sql">SQL</option>
+    </select>
+  </div>
+  <div>
+    <label for="codeInput">Enter / Paste Your Code Here</label>
+    <textarea id="codeInput" placeholder="Paste your code here...">// Paste your code here and press "Load Code"</textarea>
+  </div>
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+    <button id="loadBtn" aria-label="Load and display code with highlighting">Load Code</button>
+    <button id="clearBtn" aria-label="Clear code input and output">Clear</button>
+  </div>
+  <section class="output" id="outputSection" aria-live="polite" aria-label="Code output area">
+    <pre><code id="codeOutput" class="language-javascript"></code></pre>
+  </section>
+</main>
+
+<!-- Prism.js -->
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-c.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-cpp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-php.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-ruby.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-go.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-swift.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-kotlin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+<script>
+(() => {
+  const languageSelect = document.getElementById('languageSelect');
+  const codeInput = document.getElementById('codeInput');
+  const codeOutput = document.getElementById('codeOutput');
+  const loadBtn = document.getElementById('loadBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const loaderPage = document.getElementById('loader-page');
+  const appMain = document.getElementById('app-main');
+
+  function showApp() {
+    loaderPage.style.display = 'none';
+    appMain.classList.add('active');
+    appMain.focus();
+  }
+
+  // Show main app after a short loading delay
+  window.addEventListener('load', () => {
+    setTimeout(showApp, 2200);
+  });
+
+  loadBtn.addEventListener('click', () => {
+    const code = codeInput.value.trim();
+    if (!code) {
+      alert('Please enter or paste some code first!');
+      return;
+    }
+    const language = languageSelect.value;
+    codeOutput.className = ''; // clear old classes
+    codeOutput.classList.add('language-' + language);
+    const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    codeOutput.innerHTML = escapedCode;
+    Prism.highlightElement(codeOutput);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    codeInput.value = '';
+    codeOutput.textContent = '';
+  });
+})();
+</script>
+
+</body></html>
+
+
+
